@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.SetMealDao">
+
+    <resultMap id="setMeal" type="com.fb.xujimanage.entity.SetMeal" >
+        <result column="set_id" property="setId" />
+        <result column="diet_id" property="dietId" />
+        <result column="set_code" property="setCode" />
+        <result column="set_name" property="setName" />
+        <result column="start_date" property="startDate" />
+        <result column="end_date" property="endDate" />
+        <result column="restaurant_id" property="restaurantId" />
+        <result column="del_flag" property="delFlag" />
+        <result column="update_time" property="updateTime" />
+        <collection property="setMealDetails" ofType="com.fb.xujimanage.entity.SetMealDetail" resultMap="com.fb.xujimanage.dao.SetMealDetailDao.SetMealDetail"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `set_id`,
+        `diet_id`,
+        `set_code`,
+        `set_name`,
+        `start_date`,
+        `end_date`,
+        `restaurant_id`
+    </sql>
+
+    <insert id="insertOne" parameterType="com.fb.xujimanage.entity.copy.SetMealCopy" >
+        INSERT INTO set_meal (
+            `set_id`,
+            `diet_id`,
+            `set_code`,
+            `set_name`,
+            `start_date`,
+            `end_date`,
+            `restaurant_id`,
+             del_flag
+        )
+        VALUES(
+            #{setMealCopy.setId},
+            #{setMealCopy.dietId},
+            #{setMealCopy.setCode},
+            #{setMealCopy.setName},
+            #{setMealCopy.startDate},
+            #{setMealCopy.endDate},
+            #{setMealCopy.restaurantId},
+            #{setMealCopy.delFlag}
+        )
+    </insert>
+
+
+
+    <update id="updateOne" parameterType="com.fb.xujimanage.entity.copy.SetMealCopy" >
+        UPDATE set_meal
+        SET
+            set_id = #{setMealCopy.setId},
+            diet_id = #{setMealCopy.dietId},
+            set_code = #{setMealCopy.setCode},
+            set_name = #{setMealCopy.setName},
+            start_date = #{setMealCopy.startDate},
+            end_date = #{setMealCopy.endDate},
+            restaurant_id = #{setMealCopy.restaurantId},
+            del_flag=#{setMealCopy.delFlag},
+            update_time=#{setMealCopy.updateTime}
+        WHERE `set_id` = #{setMealCopy.setId}
+    </update>
+
+
+    <select id="selectOneById" parameterType="java.lang.Long" resultType="com.fb.xujimanage.entity.copy.SetMealCopy">
+        SELECT <include refid="Base_Column_List" />
+        FROM set_meal
+        WHERE `set_id` = #{setId}
+    </select>
+
+
+    <delete id="delsetMealByRestaurantId" parameterType="java.lang.String" >
+        DELETE FROM set_meal
+        WHERE `restaurant_id` = #{restaurantId}
+    </delete>
+
+
+    <insert id="insertSetMeal" parameterType="java.util.List">
+        INSERT INTO set_meal (
+        `set_id`,
+        `set_code`,
+        `set_name`,
+        `start_date`,
+        `end_date`,
+        `restaurant_id`,
+        `del_flag`,
+        `diet_id`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="setMealCopies" item="setMeal" index="index" separator=",">
+            (
+            #{setMeal.setId},
+            #{setMeal.setCode},
+            #{setMeal.setName},
+            #{setMeal.startDate},
+            #{setMeal.endDate},
+            #{setMeal.restaurantId},
+            #{setMeal.delFlag},
+            #{setMeal.dietId},
+            #{setMeal.updateTime}
+            )
+        </foreach>
+      </insert>
+
+
+    <delete id="delSetMeal" parameterType="java.util.List">
+        DELETE FROM set_meal
+        WHERE `set_id` in
+        <foreach collection="setIds" item="setId" open="(" separator="," close=")">
+            #{setId}
+        </foreach>
+    </delete>
+
+</mapper>

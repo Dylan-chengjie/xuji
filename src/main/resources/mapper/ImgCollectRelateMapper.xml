@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fb.xujimanage.dao.ImgCollectRelateDao">
+    <insert id="addImgCollectRelate">
+        INSERT INTO img_collect_relate (
+        `id`,
+        `img_id`,
+        `collect_id`
+        )
+        VALUES(
+        #{id},
+        #{imgId},
+        #{collectId}
+        )
+    </insert>
+
+    <delete id="deleteImgCollectRelate" parameterType="long">
+        delete from img_collect_relate WHERE 1=1
+        <if test="collectId !=null">
+            and `collect_id` = #{collectId}
+        </if>
+        <if test="imgId !=null">
+            and `img_id` = #{imgId}
+        </if>
+    </delete>
+
+    <select id="queryImgCollectRelate" parameterType="long" resultType="com.fb.xujimanage.entity.ImgCollectRelate">
+        SELECT * FROM img_collect_relate WHERE collect_id = #{collectId}
+    </select>
+</mapper>

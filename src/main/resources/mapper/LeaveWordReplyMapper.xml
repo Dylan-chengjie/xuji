@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.LeaveWordReplyDao">
+    <update id="deleteLeaveWordReply" parameterType="long">
+        update leave_word_reply set del_flag = 1 WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteReplyByWordId" parameterType="long">
+         update leave_word_reply set del_flag = 1 WHERE `leave_word_id` = #{leaveWordId}
+    </delete>
+</mapper>

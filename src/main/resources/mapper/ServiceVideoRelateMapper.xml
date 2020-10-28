@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.ServiceVideoRelateDao">
+
+    <resultMap id="ServiceVideoRelate" type="com.fb.xujimanage.entity.ServiceVideoRelate">
+        <result column="id" property="id"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="video_id" property="videoId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `service_id`,
+        `video_id`
+    </sql>
+
+    <insert id="insert" parameterType="java.util.Map">
+        INSERT INTO service_video_relate (
+            `id`,
+            `service_id`,
+            `video_id`
+        )
+        VALUES(
+            #{serviceVideoRelate.id},
+            #{serviceVideoRelate.serviceId},
+            #{serviceVideoRelate.videoId}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map">
+        DELETE FROM service_video_relate
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="java.util.Map">
+        UPDATE service_video_relate
+        SET
+            id = #{serviceVideoRelate.id},
+            service_id = #{serviceVideoRelate.serviceId},
+            video_id = #{serviceVideoRelate.videoId},
+            UpdateTime = NOW()
+        WHERE `id` = #{serviceVideoRelate.id}
+    </update>
+
+    <select id="load" parameterType="java.util.Map" resultMap="ServiceVideoRelate">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM service_video_relate
+        WHERE `id` = #{id}
+    </select>
+
+    <delete id="deleteServiceVideoRelate">
+        DELETE FROM service_video_relate
+        WHERE `service_id` = #{serviceId}
+        <if test="videoIds!=null and videoIds.length>0">
+            and video_id in
+            <foreach collection="videoIds" index="index" item="videoId" open="(" separator="," close=")">
+                #{videoId}
+            </foreach>
+        </if>
+    </delete>
+
+</mapper>

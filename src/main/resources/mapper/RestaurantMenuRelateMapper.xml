@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.RestaurantMenuRelateDao">
+
+    <resultMap id="RestaurantMenuRelate" type="com.fb.xujimanage.entity.RestaurantMenuRelate" >
+        <result column="id" property="id" />
+        <result column="restaurant_id" property="restaurantId" />
+        <result column="menu_id" property="menuId" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `restaurant_id`,
+        `menu_id`
+    </sql>
+
+    <insert id="insert" parameterType="com.fb.xujimanage.entity.RestaurantMenuRelate" >
+        INSERT INTO restaurant_menu_relate (
+            `id`,
+            `restaurant_id`,
+            `menu_id`
+        )
+        VALUES(
+            #{id},
+            #{restaurantId},
+            #{menuId}
+        )
+    </insert>
+    <insert id="insertRestaurantMenuRelateList" parameterType="java.util.List">
+        INSERT INTO restaurant_menu_relate (
+            `id`,
+            `restaurant_id`,
+            `menu_id`
+        )
+        VALUES
+        <foreach collection="list" item="restaurantMenuRelate" index="index" separator=",">
+          (
+            #{restaurantMenuRelate.id},
+            #{restaurantMenuRelate.restaurantId},
+            #{restaurantMenuRelate.menuId}
+          )
+        </foreach>
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map" >
+        DELETE FROM restaurant_menu_relate
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.fb.xujimanage.entity.RestaurantMenuRelate" >
+        UPDATE restaurant_menu_relate
+        SET
+            id = #{id},
+            restaurant_id = #{restaurantId},
+            menu_id = #{menuId}
+        WHERE `id` = #{id}
+    </update>
+    <delete id="deleteByMenuId" parameterType="java.util.Map">
+        DELETE FROM restaurant_menu_relate
+        WHERE `menu_id` = #{menuId}
+    </delete>
+
+    <select id="load" parameterType="java.util.Map" resultMap="RestaurantMenuRelate">
+        SELECT <include refid="Base_Column_List" />
+        FROM restaurant_menu_relate
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="loadByMenuId" parameterType="java.util.Map" resultMap="RestaurantMenuRelate">
+        SELECT <include refid="Base_Column_List" />
+        FROM restaurant_menu_relate
+        WHERE `menu_id` = #{menuId}
+    </select>
+
+    <select id="pageList" parameterType="java.util.Map" resultMap="RestaurantMenuRelate">
+        SELECT <include refid="Base_Column_List" />
+        FROM restaurant_menu_relate
+        LIMIT #{offset}, #{pagesize}
+    </select>
+
+    <select id="pageListCount" parameterType="java.util.Map" resultType="int">
+        SELECT count(1)
+        FROM restaurant_menu_relate
+    </select>
+
+</mapper>

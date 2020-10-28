@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.CustomerServerDao">
+    <insert id="insertCustomerServer">
+        insert into
+        `customer_server`
+        ( `user_num`, `sort_num`, `wechat`, `contact_way`, `restaurant_code`, `del_flag`, `create_by`, `update_by`, `create_time`, `update_time`)
+        values
+        (#{userNum},#{sortNum},#{wechat},#{contactWay},#{restaurantCode},0,#{createBy}, #{updateBy}, sysdate(), sysdate());
+    </insert>
+
+    <update id="updateById">
+        update customer_server set del_flag =1 where  id = #{id}
+    </update>
+
+    <update id="updateCustomerServer">
+        update customer_server
+          set
+             `user_num`=#{userNum},
+             `sort_num`=#{sortNum},
+             `wechat`=#{wechat},
+             `contact_way`=#{contactWay},
+             `restaurant_code`=#{restaurantCode},
+             `update_time`=sysdate()
+        where
+             id = #{id}
+    </update>
+
+
+    <select id="getCustomerServerInfoList" resultType="com.fb.xujimanage.entity.vo.CustomerServerVo">
+
+        SELECT
+        cs.id,
+        em.user_num userNum,
+        cs.sort_num sortNum,
+        em.user_name customerServerName,
+        em.department,
+        em.mobile contactWay,
+        em.gender,
+        re.code restaurantCode,
+        re.id    restaurantId,
+        re.restaurant_name restaurantName,
+        re.address,
+        re.area,
+        re.city,
+        cs.wechat
+        FROM
+        customer_server cs
+        LEFT JOIN restaurant re ON cs.restaurant_code = re. CODE
+        AND re.org_type = 'store'
+        AND re.del_flag = 0
+        LEFT JOIN user_manage_sys em ON cs.user_num = em.user_num
+        WHERE
+        cs.del_flag = 0
+        <if test="name != null and name !='' ">
+            AND
+            em.user_name LIKE CONCAT('%',#{name},'%')
+        </if>
+        ORDER BY cs.sort_num  DESC
+
+
+    </select>
+
+    <select id="findById" resultType="com.fb.xujimanage.entity.vo.CustomerServerVo">
+
+        SELECT
+        cs.id,
+        em.user_num userNum,
+        cs.sort_num sortNum,
+        em.user_name customerServerName,
+        em.department,
+        em.mobile contactWay,
+        em.gender,
+        re.code restaurantCode,
+        re.id    restaurantId,
+        re.restaurant_name restaurantName,
+        re.address,
+        re.area,
+        re.city,
+        cs.wechat
+        from customer_server cs,user_manage_sys em,restaurant re
+        WHERE cs.user_num=em.user_num and  cs.restaurant_code=re.code
+        and  re.org_type='store'
+        and re.del_flag=0 and cs.del_flag=0
+        and  cs.`id`=#{id}
+    </select>
+
+
+    <select id="findAll" parameterType="java.lang.String" resultType="com.fb.xujimanage.entity.vo.CustomerServerVo">
+        SELECT
+        em.id,
+        em.user_num ,
+        em.user_name,
+        em.department,
+        em.mobile,
+        em.gender,
+        re.restaurant_name,
+        re.city,
+        cs.wechat
+        from customer_server cs,user_manage_sys em,restaurant re
+        WHERE cs.user_num=em.user_num and  em.org_id=re.org_id
+        and re.org_type='dept'and re.del_flag=0 and cs.del_flag=0
+        <if test="mobile != null and mobile !='' " >
+            and em.mobile = #{mobile}
+        </if>
+        <if test="restaurantId != null and restaurantId !='' ">
+            and re.id  like CONCAT('%',#{restaurantId},'%')
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,898 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.MenuItemDao">
+    <resultMap id="orderMealMap" type="com.fb.xujimanage.entity.vo.OrderMealInfoVo">
+        <result column="meal_id" property="mealId"/>
+        <result column="quantity" property="mealQuantity"/>
+        <collection property="itemInfoVoList" column="meal_id" javaType="List"
+                    ofType="com.fb.xujimanage.entity.vo.MenuItemInfoVo" select="listMenuItemByMealId"/>
+    </resultMap>
+
+    <resultMap id="MenuItem" type="com.fb.xujimanage.entity.MenuItem">
+        <result column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="name" property="name"/>
+        <result column="unit" property="unit"/>
+        <result column="price" property="price"/>
+        <result column="feature_describe" property="featureDescribe"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="sort_num" property="sortNum"/>
+        <result column="remarks" property="remarks"/>
+        <result column="quantity" property="quantity"/>
+        <result column="is_show" property="isShow"/>
+        <result column="restaurant_code" property="restaurantCode"/>
+        <result column="restaurant_name" property="restaurantName"/>
+        <result column="code" property="code"/>
+        <result column="member_price" property="memberPrice"/>
+        <result column="big_type_code" property="bigTypeCode"/>
+        <result column="big_type_name" property="bigTypeName"/>
+        <result column="small_type_code" property="smallTypeCode"/>
+        <result column="small_type_name" property="smallTypeName"/>
+        <result column="have_kind" property="haveKind"/>
+        <result column="member_price_alter" property="memberPriceAlter"/>
+        <result column="member_pro_type" property="memberProType"/>
+        <result column="mem_price_start" property="memPriceStart"/>
+        <result column="mem_price_end" property="memPriceEnd"/>
+        <collection property="restaurantList" ofType="com.fb.xujimanage.entity.Restaurant" resultMap="restaurantMap"/>
+        <collection property="imageList" ofType="com.fb.xujimanage.entity.Image" resultMap="imageMap"/>
+        <collection property="videoList" ofType="com.fb.xujimanage.entity.Video" resultMap="videoMap"/>
+    </resultMap>
+    <resultMap id="MenuItemMap" type="com.fb.xujimanage.entity.MenuItem">
+        <result column="me_id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="me_name" property="name"/>
+        <result column="unit" property="unit"/>
+        <result column="price" property="price"/>
+        <result column="feature_describe" property="featureDescribe"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="sort_num" property="sortNum"/>
+        <result column="me_quantity" property="quantity"/>
+        <result column="di_name" property="classifyName"/>
+        <result column="is_show" property="isShow"/>
+        <!-- <result column="price_type" property="priceType"/>-->
+        <result column="member_price_alter" property="memberPriceAlter"/>
+        <result column="mem_price_start" property="memPriceStart"/>
+        <result column="mem_price_end" property="memPriceEnd"/>
+        <result column="member_price" property="memberPrice"/>
+        <result column="member_pro_type" property="memberProType"/>
+        <result property="restaurantName" column="restaurant_name" jdbcType="VARCHAR"/>
+        <result property="restaurantCode" column="restaurant_code" jdbcType="VARCHAR"/>
+        <result column="small_type_code" property="smallTypeCode"/>
+        <result property="dietName" column="name" jdbcType="VARCHAR"/>
+        <result property="priceType" column="price_type" jdbcType="VARCHAR"/>
+        <association property="setMeal" column="me_id" javaType="com.fb.xujimanage.entity.SetMeal">
+            <id column="set_id" property="setId"/>
+            <result column="diet_id" property="dietId"/>
+            <result column="set_code" property="setCode"/>
+            <result column="set_name" property="setName"/>
+            <result column="start_date" property="startDate"/>
+            <result column="end_date" property="endDate"/>
+            <result column="restaurant_id" property="restaurantId"/>
+            <result column="del_flag" property="delFlag"/>
+            <collection property="setMealDetails" ofType="com.fb.xujimanage.entity.SetMealDetail"
+                        resultMap="SetMealDetailMap"/>
+        </association>
+
+        <collection property="imageList" ofType="com.fb.xujimanage.entity.Image" resultMap="imageMap"/>
+        <collection property="videoList" ofType="com.fb.xujimanage.entity.Video" resultMap="videoMap"/>
+    </resultMap>
+
+    <resultMap id="SetMealDetailMap" type="com.fb.xujimanage.entity.SetMealDetail">
+        <result column="set_meal_id" property="setMealId"/>
+        <result column="detail_type" property="detailType"/>
+        <result column="diet_id" property="dietId"/>
+        <result column="diet_code" property="dietCode"/>
+        <result column="detail_quantity" property="detailQuantity"/>
+        <result column="add_price" property="addPrice"/>
+        <result column="default_select" property="defaultSelect"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="restaurant_id" property="restaurantId"/>
+        <result column="mi_id" property="mid"/>
+        <association property="menuItem" javaType="com.fb.xujimanage.entity.MenuItem" resultMap="MenuItemM"/>
+    </resultMap>
+    <resultMap id="MenuItemM" type="com.fb.xujimanage.entity.MenuItem">
+        <id column="mi_id" property="id"/>
+        <result column="mi_name" property="name"/>
+        <result column="quantity" property="quantity"/>
+        <result column="dt_price_type" property="dtPriceType"/>
+    </resultMap>
+
+
+    <resultMap id="restaurantMap" type="com.fb.xujimanage.entity.Restaurant">
+        <id property="id" column="reid"/>
+        <result property="restaurantName" column="restaurant_name"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="area" column="area"/>
+    </resultMap>
+
+    <resultMap id="imageMap" type="com.fb.xujimanage.entity.Image">
+        <id property="id" column="mid"/>
+        <result property="address" column="image_address"/>
+    </resultMap>
+
+    <resultMap id="videoMap" type="com.fb.xujimanage.entity.Video">
+        <id property="id" column="vid"/>
+        <result property="address" column="video_address"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        `id`,
+        `type`,
+        `name`,
+        `unit`,
+        `price`,
+        `feature_describe`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `sort_num`,
+        `remarks`,
+        `quantity`,
+        `is_show`,
+        `restaurant_code`,
+        `restaurant_name`,
+        `code`,
+        `member_price`,
+        `big_type_code`,
+        `big_type_name`,
+        `small_type_code`,
+        `small_type_name`,
+        `have_kind`,
+        `member_price_alter`,
+        `member_pro_type`,
+        `mem_price_start`,
+        `mem_price_end`
+    </sql>
+
+    <insert id="insert" parameterType="java.util.Map">
+        INSERT INTO menu_item (
+            `id`,
+            `type`,
+            `name`,
+            `unit`,
+            `price`,
+            `feature_describe`,
+            `del_flag`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`,
+            `sort_num`,
+            `remarks`,
+            `quantity`,
+            `is_show`
+        )
+        VALUES(
+            #{id},
+            #{type},
+            #{name},
+            #{unit},
+            #{price},
+            #{featureDescribe},
+            #{delFlag},
+            #{createBy},
+            #{updateBy},
+            #{createTime},
+            #{updateTime},
+            #{sortNum},
+            #{remarks},
+            #{quantity},
+            #{isShow}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map">
+        DELETE FROM menu_item
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.fb.xujimanage.entity.MenuItem">
+        UPDATE menu_item
+        SET
+        id = #{menuItem.id},
+        type = #{menuItem.type},
+        name = #{menuItem.name},
+        unit = #{menuItem.unit},
+        price = #{menuItem.price},
+        feature_describe = #{menuItem.featureDescribe},
+        del_flag = #{menuItem.delFlag},
+        create_by = #{menuItem.createBy},
+        update_by = #{menuItem.updateBy},
+        create_time = #{menuItem.createTime},
+        update_time = #{menuItem.updateTime},
+        sort_num = #{menuItem.sortNum},
+        remarks = #{menuItem.remarks},
+        quantity = #{menuItem.quantity},
+        is_show = #{menuItem.isShow},
+        restaurant_code = #{menuItem.restaurantCode},
+        restaurant_name = #{menuItem.restaurantName},
+        code = #{menuItem.code},
+        member_price = #{menuItem.memberPrice},
+        big_type_code = #{menuItem.bigTypeCode},
+        big_type_name = #{menuItem.bigTypeName},
+        small_type_code = #{menuItem.smallTypeCode},
+        small_type_name = #{menuItem.smallTypeName},
+        member_price_alter = #{menuItem.memberPriceAlter},
+        member_pro_type = #{menuItem.memberProType},
+        mem_price_start = #{menuItem.memPriceStart},
+        mem_price_end = #{menuItem.memPriceEnd},
+        have_kind = #{menuItem.haveKind}
+        WHERE `id` = #{menuItem.id} AND restaurant_code = #{menuItem.restaurantCode}
+    </update>
+
+
+    <select id="load" parameterType="java.util.Map" resultMap="MenuItem">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM menu_item
+        WHERE `id` = #{id}
+        AND del_flag = 0
+    </select>
+
+
+    <select id="loadByName" resultMap="MenuItem">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM menu_item
+        WHERE name LIKE CONCAT(CONCAT('%', #{name}),'%')
+    </select>
+
+
+    <select id="getMenuItemList" resultType="com.fb.xujimanage.entity.vo.MenuItemVo">
+         SELECT
+         mi.id,
+         mi.`code`,
+         mi.`name`,
+         mi.have_kind,
+         mi.quantity,
+         mi.restaurant_code,
+         mi.restaurant_name
+        from menu_item mi
+    </select>
+
+
+    <!--数据导入-->
+    <sql id="Base_Colu_List">
+        `id`,
+        `type`,
+        `name`,
+        `unit`,
+        `price`,
+        `feature_describe`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `sort_num`,
+        `remarks`,
+        `quantity`,
+        `is_show`,
+        `restaurant_code`,
+        `restaurant_name`,
+        `code`,
+        `member_price`,
+        `big_type_code`,
+        `big_type_name`,
+        `small_type_code`,
+        `small_type_name`,
+        `have_kind`,
+        `member_price_alter`,
+        `member_pro_type`
+    </sql>
+
+    <select id="selectOneById" parameterType="java.lang.String" resultType="com.fb.xujimanage.entity.copy.MenultemCopy">
+        SELECT
+        <include refid="Base_Colu_List"/>
+        FROM menu_item
+        WHERE `id` = #{id}
+    </select>
+
+    <update id="updateOne" parameterType="com.fb.xujimanage.entity.copy.MenultemCopy">
+        UPDATE menu_item
+        SET
+            id = #{menultemCopy.id},
+            type = #{menultemCopy.type},
+            name = #{menultemCopy.name},
+            unit = #{menultemCopy.unit},
+            price = #{menultemCopy.price},
+            feature_describe = #{menultemCopy.featureDescribe},
+            del_flag = #{menultemCopy.delFlag},
+            create_by = #{menultemCopy.createBy},
+            update_by = #{menultemCopy.updateBy},
+            create_time = #{menultemCopy.createTime},
+            update_time = #{menultemCopy.updateTime},
+            sort_num = #{menultemCopy.sortNum},
+            remarks = #{menultemCopy.remarks},
+            quantity = #{menultemCopy.quantity},
+            is_show = #{menultemCopy.isShow},
+            restaurant_code = #{menultemCopy.restaurantCode},
+            restaurant_name = #{menultemCopy.restaurantName},
+            code = #{menultemCopy.code},
+            member_price = #{menultemCopy.memberPrice},
+            big_type_code = #{menultemCopy.bigTypeCode},
+            big_type_name = #{menultemCopy.bigTypeName},
+            small_type_code = #{menultemCopy.smallTypeCode},
+            small_type_name = #{menultemCopy.smallTypeName},
+            have_kind = #{menultemCopy.haveKind},
+            member_price_alter = #{menultemCopy.memberPriceAlter},
+            member_pro_type = #{menultemCopy.memberProType},
+            update_time = #{menultemCopy.updateTime}
+        WHERE `id` = #{menultemCopy.id}
+    </update>
+
+
+    <!--已优化-添加索引-->
+    <select id="loadMenUItem" parameterType="com.fb.xujimanage.entity.vo.MenuitemReqVo" resultMap="MenuItemMap">
+        SELECT
+        di.`name` di_name,
+        me.`name` me_name,
+        me.unit,
+        me.price,
+        me.id me_id,
+        me.member_price,
+        me.member_price_alter,
+        me.mem_price_end,
+        me.mem_price_start,
+        me.feature_describe,
+        me.is_show,
+        me.small_type_code,
+        di.restaurant_name,
+        di.price_type,
+        me.member_pro_type,
+        di.restaurant_code
+        FROM
+        restaurant re
+        LEFT JOIN diet_type di ON re.`code` = di.restaurant_code AND di.del_flag = 0 AND di.big_or_small = 0
+        LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.del_flag = 0 AND di.restaurant_code =
+        me.restaurant_code
+        WHERE
+        re.del_flag = 0
+        and me.type = 1
+        AND re.org_type = 'store'
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != '' ">
+            AND di.restaurant_code = #{menuitemReqVo.restaurantCode}
+        </if>
+        <if test="menuitemReqVo.menuitemName != null and menuitemReqVo.menuitemName != '' ">
+            AND me.name LIKE concat(#{menuitemReqVo.menuitemName},'%')
+        </if>
+        <if test="menuitemReqVo.cityCode != null and menuitemReqVo.cityCode != '' ">
+            AND re.city = #{menuitemReqVo.cityCode}
+        </if>
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != ''">
+            AND re.code = #{menuitemReqVo.restaurantCode}
+        </if>
+
+        <if test="menuitemReqVo.menuItemClassify != null and menuitemReqVo.menuItemClassify.length > 0">
+            AND di.code IN
+            <foreach collection="menuitemReqVo.menuItemClassify" item="item" index="index" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="menuitemReqVo.memPriceStart != null and menuitemReqVo.memPriceStart != '' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceStart} >= me.mem_price_end
+        </if>
+
+        <if test="menuitemReqVo.memPriceEnd != null and menuitemReqVo.memPriceEnd !='' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceEnd} >= me.mem_price_end
+        </if>
+        and me.name not LIKE concat('外-','%')
+        union
+        SELECT
+        di.`name` di_name,
+        me.`name` me_name,
+        me.unit,
+        me.price,
+        me.id me_id,
+        me.member_price,
+        me.member_price_alter,
+        me.mem_price_end,
+        me.mem_price_start,
+        me.feature_describe,
+        me.is_show,
+        me.small_type_code,
+        di.restaurant_name,
+        di.price_type,
+        me.member_pro_type,
+        di.restaurant_code
+        FROM
+        restaurant re
+        LEFT JOIN diet_type di ON re.`code` = di.restaurant_code AND di.del_flag = 0 AND di.big_or_small = 0
+        LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.del_flag = 0 AND di.restaurant_code =
+        me.restaurant_code
+        inner join set_meal sm on me.id = sm.diet_id and me.type = 2 and sm.del_flag = 0
+        WHERE
+        re.del_flag = 0
+        AND re.org_type = 'store'
+        AND sm.start_date &lt;= now() &lt; sm.end_date
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != '' ">
+            AND di.restaurant_code = #{menuitemReqVo.restaurantCode}
+        </if>
+        <if test="menuitemReqVo.menuitemName != null and menuitemReqVo.menuitemName != '' ">
+            AND me.name LIKE concat(#{menuitemReqVo.menuitemName},'%')
+        </if>
+        <if test="menuitemReqVo.cityCode != null and menuitemReqVo.cityCode != '' ">
+            AND re.city = #{menuitemReqVo.cityCode}
+        </if>
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != ''">
+            AND re.code = #{menuitemReqVo.restaurantCode}
+        </if>
+
+        <if test="menuitemReqVo.menuItemClassify != null and menuitemReqVo.menuItemClassify.length > 0">
+            AND di.code IN
+            <foreach collection="menuitemReqVo.menuItemClassify" item="item" index="index" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="menuitemReqVo.memPriceStart != null and menuitemReqVo.memPriceStart != '' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceStart} >= me.mem_price_end
+        </if>
+
+        <if test="menuitemReqVo.memPriceEnd != null and menuitemReqVo.memPriceEnd !='' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceEnd} >= me.mem_price_end
+        </if>
+        and me.name not LIKE concat('外-','%')
+        LIMIT #{currentPage},#{pageSize}
+    </select>
+
+    <select id="getMenuItemTotal" resultType="int">
+        select count(1) from (
+        SELECT
+        di.`name` di_name,
+        me.`name` me_name,
+        me.unit,
+        me.price,
+        me.id me_id,
+        me.member_price,
+        me.member_price_alter,
+        me.mem_price_end,
+        me.mem_price_start,
+        me.feature_describe,
+        me.is_show,
+        me.small_type_code,
+        di.restaurant_name,
+        di.price_type,
+        me.member_pro_type,
+        di.restaurant_code
+        FROM
+        restaurant re
+        LEFT JOIN diet_type di ON re.`code` = di.restaurant_code AND di.del_flag = 0 AND di.big_or_small = 0
+        LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.del_flag = 0 AND di.restaurant_code =
+        me.restaurant_code
+        WHERE
+        re.del_flag = 0
+        and me.type = 1
+        AND re.org_type = 'store'
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != '' ">
+            AND di.restaurant_code = #{menuitemReqVo.restaurantCode}
+        </if>
+        <if test="menuitemReqVo.menuitemName != null and menuitemReqVo.menuitemName != '' ">
+            AND me.name LIKE concat(#{menuitemReqVo.menuitemName},'%')
+        </if>
+        <if test="menuitemReqVo.cityCode != null and menuitemReqVo.cityCode != '' ">
+            AND re.city = #{menuitemReqVo.cityCode}
+        </if>
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != ''">
+            AND re.code = #{menuitemReqVo.restaurantCode}
+        </if>
+
+        <if test="menuitemReqVo.menuItemClassify != null and menuitemReqVo.menuItemClassify.length > 0">
+            AND di.code IN
+            <foreach collection="menuitemReqVo.menuItemClassify" item="item" index="index" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="menuitemReqVo.memPriceStart != null and menuitemReqVo.memPriceStart != '' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceStart} >= me.mem_price_end
+        </if>
+
+        <if test="menuitemReqVo.memPriceEnd != null and menuitemReqVo.memPriceEnd !='' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceEnd} >= me.mem_price_end
+        </if>
+        and me.name not LIKE concat('外-','%')
+        union
+        SELECT
+        di.`name` di_name,
+        me.`name` me_name,
+        me.unit,
+        me.price,
+        me.id me_id,
+        me.member_price,
+        me.member_price_alter,
+        me.mem_price_end,
+        me.mem_price_start,
+        me.feature_describe,
+        me.is_show,
+        me.small_type_code,
+        di.restaurant_name,
+        di.price_type,
+        me.member_pro_type,
+        di.restaurant_code
+        FROM
+        restaurant re
+        LEFT JOIN diet_type di ON re.`code` = di.restaurant_code AND di.del_flag = 0 AND di.big_or_small = 0
+        LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.del_flag = 0 AND di.restaurant_code =
+        me.restaurant_code
+        inner join set_meal sm on me.id = sm.diet_id and me.type = 2 and sm.del_flag = 0
+        WHERE
+        re.del_flag = 0
+        AND re.org_type = 'store'
+        AND sm.start_date &lt;= now() &lt; sm.end_date
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != '' ">
+            AND di.restaurant_code = #{menuitemReqVo.restaurantCode}
+        </if>
+        <if test="menuitemReqVo.menuitemName != null and menuitemReqVo.menuitemName != '' ">
+            AND me.name LIKE concat(#{menuitemReqVo.menuitemName},'%')
+        </if>
+        <if test="menuitemReqVo.cityCode != null and menuitemReqVo.cityCode != '' ">
+            AND re.city = #{menuitemReqVo.cityCode}
+        </if>
+        <if test="menuitemReqVo.restaurantCode != null and menuitemReqVo.restaurantCode != ''">
+            AND re.code = #{menuitemReqVo.restaurantCode}
+        </if>
+
+        <if test="menuitemReqVo.menuItemClassify != null and menuitemReqVo.menuItemClassify.length > 0">
+            AND di.code IN
+            <foreach collection="menuitemReqVo.menuItemClassify" item="item" index="index" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="menuitemReqVo.memPriceStart != null and menuitemReqVo.memPriceStart != '' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceStart} >= me.mem_price_end
+        </if>
+
+        <if test="menuitemReqVo.memPriceEnd != null and menuitemReqVo.memPriceEnd !='' ">
+            AND me.mem_price_start >= #{menuitemReqVo.memPriceEnd} >= me.mem_price_end
+        </if>
+        and me.name not LIKE concat('外-','%')
+        ) a
+    </select>
+
+
+    <insert id="insertOne" parameterType="com.fb.xujimanage.entity.copy.MenultemCopy">
+        INSERT INTO menu_item (
+            `id`,
+            `type`,
+            `name`,
+            `unit`,
+            `price`,
+            `feature_describe`,
+            `del_flag`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`,
+            `sort_num`,
+            `remarks`,
+            `quantity`,
+            `is_show`,
+            `restaurant_code`,
+            `restaurant_name`,
+            `code`,
+            `member_price`,
+            `big_type_code`,
+            `big_type_name`,
+            `small_type_code`,
+            `small_type_name`,
+            `have_kind`,
+            `member_price_alter`,
+            `member_pro_type`
+        )
+        VALUES(
+            #{menultemCopy.id},
+            #{menultemCopy.type},
+            #{menultemCopy.name},
+            #{menultemCopy.unit},
+            #{menultemCopy.price},
+            #{menultemCopy.featureDescribe},
+            #{menultemCopy.delFlag},
+            #{menultemCopy.createBy},
+            #{menultemCopy.updateBy},
+            #{menultemCopy.createTime},
+            #{menultemCopy.updateTime},
+            #{menultemCopy.sortNum},
+            #{menultemCopy.remarks},
+            #{menultemCopy.quantity},
+            #{menultemCopy.isShow},
+            #{menultemCopy.restaurantCode},
+            #{menultemCopy.restaurantName},
+            #{menultemCopy.code},
+            #{menultemCopy.memberPrice},
+            #{menultemCopy.bigTypeCode},
+            #{menultemCopy.bigTypeName},
+            #{menultemCopy.smallTypeCode},
+            #{menultemCopy.smallTypeName},
+            #{menultemCopy.haveKind},
+            #{menultemCopy.memberPriceAlter},
+            #{menultemCopy.memberProType}
+        )
+    </insert>
+
+    <select id="listMenuItemByOrderId" parameterType="long" resultType="com.fb.xujimanage.entity.vo.MenuItemInfoVo">
+        select item_code,use_price,member_price_alter as memberPrice,item_type,quantity,item_name,meal_id from
+        order_item_relate
+        where 1=1
+        <if test="mealId != null">
+            and meal_id = #{mealId}
+        </if>
+        <if test="orderId != null">
+            and order_id = #{orderId}
+        </if>
+        <if test="itemType != null">
+            and item_type = #{itemType}
+        </if>
+    </select>
+
+    <select id="listMealRelateByOrderId" resultType="com.fb.xujimanage.entity.vo.MealInfoVo">
+        select distinct set_meal_id,set_name,use_price,member_price_alter as memberPrice,item_type,diet_quantity as
+        quantity from
+        order_set_meal_relate
+        where order_id = #{orderId}
+        <if test="itemType != null">
+            and item_type = #{itemType}
+        </if>
+    </select>
+
+    <select id="listOrderMealByOrderId" parameterType="long" resultMap="orderMealMap">
+        select meal_id,quantity from order_item_relate where item_type = 2 and order_id = #{orderId}
+    </select>
+
+    <select id="queryMenuItemByMealId" parameterType="long" resultType="com.fb.xujimanage.entity.vo.OrderMealVo">
+        select order_id,set_meal_id as mealId,diet_quantity,item_name from order_set_meal_relate where item_type = 2 and set_meal_id = #{mealId}
+    </select>
+
+    <select id="listMenuItemByMealId" resultType="com.fb.xujimanage.entity.vo.MenuItemInfoVo">
+        select item_code,use_price,member_price,item_type,diet_quantity as quantity,set_meal_id as mealId,item_name
+        from order_set_meal_relate
+         where set_meal_id = #{mealId}
+    </select>
+
+    <select id="selectMenuItemCopy" resultType="com.fb.xujimanage.entity.copy.MenultemCopy"
+            parameterType="java.util.List">
+        SELECT
+        * from menu_item
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteMenuItemCopy" parameterType="java.util.List">
+        DELETE FROM menu_item
+        WHERE `id`in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <insert id="insertMenuItemCopy" parameterType="java.util.List">
+        INSERT INTO menu_item (
+        `id`,
+        `type`,
+        `name`,
+        `unit`,
+        `price`,
+        `feature_describe`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `sort_num`,
+        `remarks`,
+        `quantity`,
+        `is_show`,
+        `restaurant_code`,
+        `restaurant_name`,
+        `code`,
+        `member_price`,
+        `big_type_code`,
+        `big_type_name`,
+        `small_type_code`,
+        `small_type_name`,
+        `have_kind`,
+        `member_price_alter`,
+        `member_pro_type`
+        )
+        VALUES
+        <foreach collection="menultemCopies" item="menultemCopie" index="index" separator=",">
+            (
+            #{menultemCopie.id},
+            #{menultemCopie.type},
+            #{menultemCopie.name},
+            #{menultemCopie.unit},
+            #{menultemCopie.price},
+            #{menultemCopie.featureDescribe},
+            #{menultemCopie.delFlag},
+            #{menultemCopie.createBy},
+            #{menultemCopie.updateBy},
+            #{menultemCopie.createTime},
+            #{menultemCopie.updateTime},
+            #{menultemCopie.sortNum},
+            #{menultemCopie.remarks},
+            #{menultemCopie.quantity},
+            #{menultemCopie.isShow},
+            #{menultemCopie.restaurantCode},
+            #{menultemCopie.restaurantName},
+            #{menultemCopie.code},
+            #{menultemCopie.memberPrice},
+            #{menultemCopie.bigTypeCode},
+            #{menultemCopie.bigTypeName},
+            #{menultemCopie.smallTypeCode},
+            #{menultemCopie.smallTypeName},
+            #{menultemCopie.haveKind},
+            #{menultemCopie.memberPriceAlter},
+            #{menultemCopie.memberProType}
+            )
+        </foreach>
+    </insert>
+
+
+    <update id="updateMenuItem" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE menu_item
+            SET
+            quantity = #{item.quantity},
+            have_kind = #{item.haveKind},
+            update_time = NOW()
+            WHERE id = #{item.id}
+            and restaurant_code = #{item.restaurantCode}
+        </foreach>
+    </update>
+
+    <select id="selectMenuItemByRestaurantCode" parameterType="java.lang.String"
+            resultType="com.fb.xujimanage.entity.copy.MenultemCopy">
+        SELECT *
+        FROM menu_item
+        WHERE `restaurant_code` = #{restaurantCode}
+    </select>
+
+    <delete id="deleteMenuItemByRestaurantCode" parameterType="java.lang.String">
+        DELETE FROM menu_item
+        WHERE `restaurant_code` = #{restaurantCode}
+    </delete>
+
+    <select id="getMenuItemByRestaurantCode" resultType="com.fb.xujimanage.entity.MenuItem">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM menu_item
+        WHERE `id` = #{id} AND restaurant_code = #{restaurantCode}
+        AND del_flag = 0
+    </select>
+
+
+    <select id="menuItemTotalCount" resultType="int">
+        select count(1) from (SELECT
+        di.`name` di_name,
+        me.`name` me_name,
+        me.unit,
+        me.price,
+        me.id me_id,
+        me.member_price,
+        me.member_price_alter,
+        me.mem_price_end,
+        me.mem_price_start,
+        me.feature_describe,
+        me.is_show,
+        me.small_type_code,
+        di.restaurant_name,
+        di.price_type,
+        me.member_pro_type,
+        di.restaurant_code
+        FROM
+        restaurant re
+        LEFT JOIN diet_type di ON re.`code` = di.restaurant_code AND di.del_flag = 0 AND di.big_or_small = 0
+        LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.del_flag = 0 AND di.restaurant_code =
+        me.restaurant_code
+        WHERE
+        re.del_flag = 0
+        and me.type = 1
+        AND re.org_type = 'store'
+        and me.name not LIKE concat('外-','%')
+        union
+        SELECT
+        di.`name` di_name,
+        me.`name` me_name,
+        me.unit,
+        me.price,
+        me.id me_id,
+        me.member_price,
+        me.member_price_alter,
+        me.mem_price_end,
+        me.mem_price_start,
+        me.feature_describe,
+        me.is_show,
+        me.small_type_code,
+        di.restaurant_name,
+        di.price_type,
+        me.member_pro_type,
+        di.restaurant_code
+        FROM
+        restaurant re
+        LEFT JOIN diet_type di ON re.`code` = di.restaurant_code AND di.del_flag = 0 AND di.big_or_small = 0
+        LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.del_flag = 0 AND di.restaurant_code =
+        me.restaurant_code
+        inner join set_meal sm on me.id = sm.diet_id and me.type = 2 and sm.del_flag = 0
+        WHERE
+        re.del_flag = 0
+        AND re.org_type = 'store'
+        AND sm.start_date &lt;= now() &lt; sm.end_date
+        and me.name not LIKE concat('外-','%')) a
+    </select>
+
+
+    <!--已优化-添加索引-->
+    <select id="loadMenUItemById" resultMap="MenuItemMap">
+        SELECT
+            di.`name` di_name,
+            me.`name` me_name,
+            me.unit,
+            me.price,
+            me.member_price,
+            me.member_price_alter,
+            me.mem_price_end,
+            me.mem_price_start,
+            me.feature_describe,
+            me.is_show,
+            di.restaurant_name,
+            di.price_type,
+            me.member_pro_type,
+            me.type,
+            ma.id mid,
+            me.id me_id,
+            ma.address image_address,
+            vi.id vid,
+            vi.address video_address,
+            se.set_id,
+            se.set_name,
+            sm.set_meal_id,
+            sm.detail_type,
+            sm.detail_quantity,
+            sm.default_select,
+            mi.id  mi_id,
+            mi.`name` mi_name,
+            di.restaurant_name,
+            mi.quantity,
+            dt.price_type dt_price_type
+        FROM
+            restaurant re
+            LEFT JOIN diet_type di ON re.`code` = di.restaurant_code
+            AND di.del_flag = 0 AND re.`code` = #{restaurantCode}
+            LEFT JOIN menu_item me ON di.`code` = me.small_type_code AND me.restaurant_code = #{restaurantCode}
+            AND me.del_flag = 0 AND di.code = #{dietCode}
+            LEFT JOIN menuitem_img_relate mr ON me.id = mr.menu_item_id
+            LEFT JOIN image ma ON mr.img_id = ma.id
+            AND ma.del_flag = 0
+            LEFT JOIN menuitem_video_relate mv ON me.id = mv.menu_item_id
+            LEFT JOIN video vi ON mv.video_id = vi.id
+            AND vi.del_flag = 0
+            AND di.big_or_small = 0
+            LEFT JOIN set_meal se ON me.id = se.diet_id
+            LEFT JOIN set_meal_detail sm ON se.set_id = sm.set_meal_id
+            LEFT JOIN menu_item mi ON sm.diet_id = mi.id AND mi.restaurant_code = #{restaurantCode}
+            AND mi.del_flag = 0
+            LEFT JOIN diet_type dt  on mi.small_type_code=dt.code and dt.del_flag=0
+            and  dt.restaurant_code=#{restaurantCode}
+        WHERE
+            re.del_flag = 0
+            AND me.id = #{menuItemId}
+            AND re.org_type = 'store'
+    </select>
+
+</mapper>

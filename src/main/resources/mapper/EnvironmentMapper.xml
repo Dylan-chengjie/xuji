@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.EnvironmentDao">
+
+    <resultMap id="EnvironmentMap" type="com.fb.xujimanage.entity.Environment">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="scene_dicvalue_id" property="sceneDicvalueId"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remarks" property="remarks"/>
+        <result column="total" property="total"/>
+        <!--<association property="restaurant" javaType="com.fb.xujimanage.entity.Restaurant" resultMap="com.fb.xujimanage.dao.RestaurantDao.Restaurant"/>-->
+        <collection property="restaurantList" ofType="com.fb.xujimanage.entity.Restaurant" resultMap="restaurantMap"/>
+        <collection property="imageList" ofType="com.fb.xujimanage.entity.Image" resultMap="imageMap"/>
+        <collection property="videoList" ofType="com.fb.xujimanage.entity.Video" resultMap="videoMap"/>
+    </resultMap>
+    <resultMap id="restaurantMap" type="com.fb.xujimanage.entity.Restaurant">
+        <id property="id" column="reid"/>
+        <result property="restaurantName" column="restaurant_name"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="area" column="area"/>
+    </resultMap>
+
+    <resultMap id="imageMap" type="com.fb.xujimanage.entity.Image">
+        <id property="id" column="mid"/>
+        <result property="address" column="image_address"/>
+    </resultMap>
+
+    <resultMap id="videoMap" type="com.fb.xujimanage.entity.Video">
+        <id property="id" column="vid"/>
+        <result property="address" column="video_address"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `name`,
+        `scene_dicvalue_id`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `remarks`
+    </sql>
+
+    <insert id="insert" parameterType="com.fb.xujimanage.entity.Environment">
+        INSERT INTO environment (
+            `id`,
+            `name`,
+            `scene_dicvalue_id`,
+            `del_flag`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`,
+            `remarks`
+        )
+        VALUES(
+            #{id},
+            #{name},
+            #{sceneDicvalueId},
+            #{delFlag},
+            #{createBy},
+            #{updateBy},
+            #{createTime},
+            #{updateTime},
+            #{remarks}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map">
+        DELETE FROM environment
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.fb.xujimanage.entity.Environment">
+        UPDATE environment
+        SET
+            id = #{id},
+            name = #{name},
+            scene_dicvalue_id = #{sceneDicvalueId},
+            del_flag = #{delFlag},
+            create_by = #{createBy},
+            update_by = #{updateBy},
+            create_time = #{createTime},
+            update_time = #{updateTime},
+            remarks = #{remarks}
+        WHERE `id` = #{id}
+    </update>
+
+
+    <select id="load" parameterType="java.util.Map" resultMap="EnvironmentMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM environment
+        WHERE `id` = #{id}
+        AND del_flag = 0
+    </select>
+
+    <select id="selectEnvironmentInfo" resultMap="EnvironmentMap">
+        SELECT
+        en.id,
+        en.`name`,
+        en.scene_dicvalue_id,
+        re.restaurant_name,
+        re.address,
+        re.city,
+        re.area,
+        re.id AS reid,
+        vi.id AS vid,
+        vi.address AS video_address,
+        im.id AS mid,
+        im.address AS image_address
+        FROM
+        (SELECT id,`name`,scene_dicvalue_id,create_time FROM environment WHERE del_flag = 0
+        <if test="environmentalName != null and environmentalName != '' ">
+            AND `name` LIKE concat('%',#{environmentalName},'%')
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{currentPage},#{pageSize}) en
+        LEFT JOIN restaurant_environment_relate res ON en.id = res.environment_id
+        LEFT JOIN restaurant re ON res.restaurant_id = re.id AND re.del_flag = 0 AND re.org_type = 'store'
+        LEFT JOIN environment_img_relate mi ON en.id = mi.environment_id
+        LEFT JOIN image im ON mi.img_id = im.id AND im.del_flag = 0
+        LEFT JOIN environment_video_relate mv ON en.id = mv.environment_id
+        LEFT JOIN video vi ON mv.video_id = vi.id AND vi.del_flag = 0
+    </select>
+
+    <select id="selectEnvironmentByName" resultMap="EnvironmentMap">
+        SELECT
+         en.id,
+         en.name,
+         en.scene_dicvalue_id,
+         re.`name` restaurantName,
+         re.address
+        FROM
+         environment en
+         LEFT JOIN restaurant_environment_relate nt ON en.id = nt.environment_id
+         LEFT JOIN restaurant re ON nt.restaurant_id = re.id AND re.del_flag = 0 AND re.org_type = 'store'
+        WHERE
+         en.del_flag = 0
+         AND en.name LIKE `%#{name}%`
+    </select>
+
+    <select id="selectEnvironmentById" resultMap="EnvironmentMap">
+         SELECT
+         en.id,
+         en.name,
+         en.scene_dicvalue_id,
+         re.`name` restaurantName,
+         re.address
+        FROM
+         environment en
+         LEFT JOIN restaurant_environment_relate nt ON en.id = nt.environment_id
+         LEFT JOIN restaurant re ON nt.restaurant_id = re.id AND re.del_flag = 0 AND re.org_type = 'store'
+        WHERE
+         en.del_flag = 0
+         AND en.id = #{environmentId}
+    </select>
+
+    <select id="selectEnvironment" resultMap="EnvironmentMap">
+        SELECT
+            en.id
+        FROM
+            environment en
+            LEFT JOIN restaurant_environment_relate nt ON en.id = nt.environment_id
+            LEFT JOIN restaurant re ON nt.restaurant_id = re.id
+            AND re.del_flag = 0
+            AND re.org_type = 'store'
+        WHERE
+            en.del_flag = 0
+            AND en.scene_dicvalue_id = #{sceneId}
+            AND re.id = #{restaurantId}
+    </select>
+
+    <select id="getEnvironmentTotal" resultType="int">
+        SELECT COUNT(id) FROM environment WHERE del_flag = 0
+        <if test="environmentalName != null and environmentalName != '' ">
+            AND `name` LIKE concat('%',#{environmentalName},'%')
+        </if>
+    </select>
+
+</mapper>

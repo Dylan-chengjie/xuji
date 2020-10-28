@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.OrderDinnerDao">
+    <update id="updateOrderDinner" parameterType="com.fb.xujimanage.entity.OrderDinner">
+        UPDATE xuji_order
+         <set>
+             <if test="verify !=null">
+                 verify = #{verify},
+             </if>
+             <if test="checkStatus !=null">
+                  check_status = #{checkStatus},
+             </if>
+             <if test="orderStatus !=null">
+                 order_status = #{orderStatus},
+             </if>
+
+         </set>
+
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="pageOrderDinner" resultType="com.fb.xujimanage.entity.vo.OrderDinnerVo">
+        SELECT o.*,r.restaurant_name,r.city,r.area,r.address,u.phone,u.cno,u.customer_name FROM restaurant r
+        INNER JOIN xuji_order o ON r.`id` = o.`restaurant_id`
+        LEFT JOIN user_customer u ON o.`customer_id` = u.`id`
+        WHERE order_type = 1
+        <if test="city !=null and city !=''">
+            and r.city =#{city}
+        </if>
+        <if test="area !=null and area !=''">
+            and r.area =#{area}
+        </if>
+        <if test="orderStatus !=null">
+            and o.order_status =#{orderStatus}
+        </if>
+        <if test="timeStart !=null">
+            and o.time_start &gt;= #{timeStart}
+        </if>
+        <if test="timeEnd !=null">
+            and o.time_end &lt;= #{timeEnd}
+        </if>
+        <if test="orderTimeStart !=null">
+            and o.create_time &gt;= #{orderTimeStart}
+        </if>
+        <if test="orderTimeEnd !=null">
+            and o.create_time &lt;= #{orderTimeEnd}
+        </if>
+        <if test="restaurantName !=null and restaurantName !=''">
+            and (r.restaurant_name like CONCAT(CONCAT('%', #{restaurantName}), '%') or o.order_number like CONCAT(CONCAT('%', #{restaurantName}), '%'))
+        </if>
+        order by o.create_time desc
+    </select>
+
+    <select id="listOrderDinner" resultType="com.fb.xujimanage.entity.vo.OrderDinnerInfoVo">
+    select o.id,o.order_number,o.customer_id, desk_num,o.amount_money,o.order_status,o.person_count,
+    o.create_time as scheduledDate,o.time_start,o.time_end,o.customer_require,o.create_time,
+    o.create_time as updateTime,r.code,r.restaurant_name,order_type
+     from xuji_order o inner join restaurant r on o.restaurant_id = r.id
+    where o.restaurant_id = #{restaurantId} and o.create_time &gt;= #{startTime}
+    </select>
+
+    <select id="queryUserCustomerInfo" resultType="com.fb.xujimanage.entity.vo.UserCustomerInfoVo">
+        select id,cno,customer_name,phone from user_customer where id in
+        <foreach collection="customerIds" index="index" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+    </select>
+</mapper>

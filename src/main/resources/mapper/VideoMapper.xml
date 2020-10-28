@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.VideoDao">
+
+    <resultMap id="Video" type="com.fb.xujimanage.entity.Video">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="url" property="url"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="sort_num" property="sortNum"/>
+        <result column="remarks" property="remarks"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `name`,
+        `address`,
+        `url`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `sort_num`,
+        `remarks`
+    </sql>
+
+    <insert id="insert" parameterType="com.fb.xujimanage.entity.Video">
+        INSERT INTO video (
+            `id`,
+            `name`,
+            `address`,
+            `url`,
+            `del_flag`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`,
+            `sort_num`,
+            `remarks`
+        )
+        VALUES(
+            #{id},
+            #{name},
+            #{address},
+            #{url},
+            #{delFlag},
+            #{createBy},
+            #{updateBy},
+            #{createTime},
+            #{updateTime},
+            #{sortNum},
+            #{remarks}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map">
+        DELETE FROM video
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="batchDeleteByIds" parameterType="long">
+        UPDATE video SET del_flag = 1 WHERE `id` in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="update" parameterType="com.fb.xujimanage.entity.Video">
+        UPDATE video
+        SET
+            id = #{id},
+            name = #{name},
+            address = #{address},
+            url = #{url},
+            del_flag = #{delFlag},
+            create_by = #{createBy},
+            update_by = #{updateBy},
+            create_time = #{createTime},
+            update_time = #{updateTime},
+            sort_num = #{sortNum},
+            remarks = #{remarks},
+            UpdateTime = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+
+    <select id="load" parameterType="java.util.Map" resultMap="Video">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM video
+        WHERE `id` = #{id}
+    </select>
+
+
+</mapper>

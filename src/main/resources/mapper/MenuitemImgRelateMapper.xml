@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.MenuitemImgRelateDao">
+
+    <resultMap id="MenuitemImgRelate" type="com.fb.xujimanage.entity.MenuitemImgRelate" >
+        <result column="id" property="id" />
+        <result column="menu_item_id" property="menuItemId" />
+        <result column="img_id" property="imgId" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `menu_item_id`,
+        `img_id`
+    </sql>
+
+    <insert id="insert" parameterType="java.util.Map" >
+        INSERT INTO menuitem_img_relate (
+            `id`,
+            `menu_item_id`,
+            `img_id`
+        )
+        VALUES(
+            #{menuitemImgRelate.id},
+            #{menuitemImgRelate.menuItemId},
+            #{menuitemImgRelate.imgId}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map" >
+        DELETE FROM menuitem_img_relate
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="java.util.Map" >
+        UPDATE menuitem_img_relate
+        SET
+            id = #{menuitemImgRelate.id},
+            menu_item_id = #{menuitemImgRelate.menuItemId},
+            img_id = #{menuitemImgRelate.imgId},
+            UpdateTime = NOW()
+        WHERE `id` = #{menuitemImgRelate.id}
+    </update>
+
+
+    <select id="load" parameterType="java.util.Map" resultMap="MenuitemImgRelate">
+        SELECT <include refid="Base_Column_List" />
+        FROM menuitem_img_relate
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="pageList" parameterType="java.util.Map" resultMap="MenuitemImgRelate">
+        SELECT <include refid="Base_Column_List" />
+        FROM menuitem_img_relate
+        LIMIT #{offset}, #{pagesize}
+    </select>
+
+    <select id="pageListCount" parameterType="java.util.Map" resultType="int">
+        SELECT count(1)
+        FROM menuitem_img_relate
+    </select>
+
+    <delete id="deleteMenuitemImgRelateById" parameterType="java.util.Map">
+        DELETE FROM menuitem_img_relate
+        WHERE `menu_item_id` = #{menuItemId}
+    </delete>
+
+    <delete id="deleteMenuItemImgRelate" parameterType="java.util.Map">
+        DELETE FROM menuitem_img_relate
+        WHERE menu_item_id = #{menuItemId}
+        <if test="imageIds!=null and imageIds.length>0">
+            and img_id in
+            <foreach collection="imageIds" index="index" item="imageId" open="(" separator="," close=")">
+                #{imageId}
+            </foreach>
+        </if>
+    </delete>
+
+</mapper>

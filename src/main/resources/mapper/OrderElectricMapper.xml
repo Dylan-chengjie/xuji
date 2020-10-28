@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.OrderElectricDao">
+
+    <resultMap id="OrderElectric" type="com.fb.xujimanage.entity.OrderElectric">
+        <result column="id" property="id"/>
+        <result column="person_count" property="personCount"/>
+        <result column="customer_require" property="customerRequire"/>
+        <result column="create_time" property="createTime"/>
+        <result column="desk_num" property="deskNum"/>
+        <result column="status" property="status"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="user_cus_id" property="userCusId"/>
+        <result column="restaurant_id" property="restaurantId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        `id`,
+        `person_count`,
+        `customer_require`,
+        `create_time`,
+        `desk_num`,
+        `status`,
+        `order_number`,
+        `user_cus_id`,
+        `restaurant_id`
+    </sql>
+
+
+    <select id="pageList" resultType="com.fb.xujimanage.entity.vo.OrderElectricPageVo">
+        SELECT o.id,
+        u.phone AS userTel,
+        u.id AS userId,
+        u.customer_name AS userName,
+        o.order_number AS orderNumber,
+        r.restaurant_name AS restaurantName,
+        r.city,
+        r.address,
+        r.`code` AS restaurantCode,
+        o.amount_money AS amountMoney,
+        o.desk_num AS deskNum,
+        o.person_count AS personCount,
+        o.customer_require AS orderRemark,
+        o.create_time AS createTime,
+        o.`order_status` as status
+        FROM xuji_order o
+        LEFT JOIN user_customer u
+        ON o.customer_id = u.id
+        LEFT JOIN restaurant r
+        ON o.restaurant_id = r.id
+        <where>
+            and o.order_type = 0
+            <if test="cityCode !=null and cityCode!=''">
+                and r.city =#{cityCode}
+            </if>
+
+            <if test="nameOrOrderNo!=null and nameOrOrderNo!=''">
+                and ( r.restaurant_name like CONCAT('%',#{nameOrOrderNo},'%') or o.order_number like
+                CONCAT('%',#{nameOrOrderNo},'%'))
+            </if>
+            <if test="orderTimeBegin !=null and  orderTimeBegin !=''">
+                and o.create_time <![CDATA[ >= ]]> #{orderTimeBegin}
+            </if>
+            <if test="orderTimeEnd!=null and orderTimeEnd!=''">
+                and o.create_time<![CDATA[ <= ]]> #{orderTimeEnd}
+            </if>
+        </where>
+        order by o.create_time desc
+    </select>
+
+    <select id="getOrderMealDetailsByMealId" resultType="com.fb.xujimanage.entity.vo.OrderElectricDetailsVo">
+        SELECT
+            r.item_name AS itemName,
+            r.diet_id AS itemId,
+            r.diet_quantity AS quantity,
+            r.order_id AS orderId,
+            r.use_price AS orderPrice,
+            CONVERT (
+                r.diet_quantity * r.use_price,
+                DECIMAL (10, 2)
+            ) AS countPrice,
+            r.item_type AS itemType,
+            r.set_meal_id AS mealId
+        FROM
+            order_set_meal_relate r
+        WHERE
+            r.order_id = #{orderId}
+        AND r.set_meal_id =#{mealId}
+    </select>
+
+
+</mapper>

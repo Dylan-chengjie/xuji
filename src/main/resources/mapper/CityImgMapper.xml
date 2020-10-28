@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.CityImgDao">
+
+    <resultMap id="CityImg" type="com.fb.xujimanage.entity.CityImg" >
+        <result column="city_code" property="cityCode" />
+        <result column="city_name" property="cityName" />
+        <result column="img_id" property="imgId" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `city_code`,
+        `city_name`,
+        `img_id`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`
+    </sql>
+
+    <insert id="insert" parameterType="java.util.Map" >
+        INSERT INTO city_img (
+            `city_code`,
+            `city_name`,
+            `img_id`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`
+        )
+        VALUES(
+            #{cityImg.cityCode},
+            #{cityImg.cityName},
+            #{cityImg.imgId},
+            #{cityImg.createBy},
+            #{cityImg.updateBy},
+            #{cityImg.createTime},
+            #{cityImg.updateTime}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map" >
+        DELETE FROM city_img
+        WHERE `city_code` = #{cityCode}
+    </delete>
+
+    <update id="update" parameterType="java.util.Map" >
+        UPDATE city_img
+        SET
+            img_id = #{cityImg.imgId},
+            update_by = #{cityImg.updateBy},
+            update_time = #{cityImg.updateTime}
+        WHERE `city_code`=#{cityImg.cityCode}
+    </update>
+
+
+    <select id="loadByCityCode" parameterType="java.util.Map" resultType="com.fb.xujimanage.entity.CityImg">
+        SELECT <include refid="Base_Column_List" />
+        FROM city_img
+        WHERE city_code =#{cityCode} limit 1
+    </select>
+    <select id="allList" resultType="com.fb.xujimanage.entity.CityImg">
+        SELECT <include refid="Base_Column_List" />
+        FROM city_img
+    </select>
+
+    <select id="pageList" resultType="com.fb.xujimanage.entity.vo.CityImgPageVo">
+        SELECT DISTINCT
+        (r.city) AS cityCode,
+        c.`img_id` AS imageId,
+        i.`address` AS imageUrl,
+        c.`city_name` AS cityName
+        FROM
+        `restaurant` r
+        LEFT JOIN city_img c
+        ON r.`city` = c.`city_code`
+        LEFT JOIN image i
+        ON c.img_id = i.id
+        WHERE r.city <![CDATA[ <> ]]> ''
+        AND  r.`code` IS NOT NULL
+        AND r.address !=''
+        AND r.address IS NOT NULL
+        and r.del_flag=0
+        <if test="cityName!=null and cityName !='' ">
+          and c.`city_name` LIKE CONCAT('%',#{cityName},'%')
+        </if>
+
+
+    </select>
+
+</mapper>

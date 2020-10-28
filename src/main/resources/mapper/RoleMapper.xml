@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.RoleDao">
+    <insert id="addRole" parameterType="com.fb.xujimanage.entity.Role">
+        INSERT INTO role (
+        `id`, `role_name`, `role_remark`, `del_flag`,
+        `create_by`, `update_by`, `create_time`, `update_time`
+        )
+        VALUES(
+        #{id}, #{roleName}, #{roleRemark}, 0,
+        #{createBy}, #{updateBy}, sysdate(), sysdate()
+        )
+    </insert>
+
+    <insert id="addRolePrivileged" parameterType="com.fb.xujimanage.entity.RoleMenuPriviRelate">
+        INSERT INTO role_menu_privi_relate (
+        `id`, `role_id`, `privileged_code`)
+        VALUES(
+        #{id}, #{roleId}, #{privilegedCode})
+    </insert>
+
+    <update id="batchDeleteRole" parameterType="long">
+        update role set del_flag = 1 WHERE `id` in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="batchDeleteRolePrivilegedRelate" parameterType="long">
+        delete from role_menu_privi_relate WHERE `role_id` in
+        <foreach collection="roleIds" index="index" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+    <update id="updateRole" parameterType="com.fb.xujimanage.entity.Role">
+        UPDATE role SET
+        <if test="roleName !=null and roleName !=''">
+            role_name = #{roleName},
+        </if>
+        <if test="roleRemark !=null and roleRemark !=''">
+            role_remark = #{roleRemark},
+        </if>
+        <if test="updateBy !=null and updateBy !=''">
+            update_by = #{updateBy},
+        </if>
+        update_time = sysdate()
+        WHERE del_flag = 0 and id = #{id}
+    </update>
+
+    <select id="pageRole" resultType="com.fb.xujimanage.entity.Role">
+        SELECT * FROM role where del_flag = 0 order by create_time desc
+    </select>
+</mapper>

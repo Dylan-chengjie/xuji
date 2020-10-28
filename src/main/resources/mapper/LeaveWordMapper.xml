@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.LeaveWordDao">
+    <resultMap id="leaveWordMap" type="com.fb.xujimanage.entity.vo.LeaveWordVo">
+        <result column="id" property="id"/>
+        <result column="word_type" property="wordType"/>
+        <result column="word_content" property="wordContent"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="restaurant_id" property="restaurantId"/>
+        <result column="restaurant_city" property="restaurantCity"/>
+        <result column="restaurant_area" property="restaurantArea"/>
+        <result column="restaurant_name" property="restaurantName"/>
+        <result column="address" property="restaurantAddress"/>
+        <result column="diet_score" property="dietScore"/>
+        <result column="service_score" property="serviceScore"/>
+        <result column="environment_score" property="environmentScore"/>
+        <collection property="leaveWordReplies" column="id" javaType="List"
+                    ofType="com.fb.xujimanage.entity.LeaveWordReply" select="queryLeaveWordReply"/>
+    </resultMap>
+
+    <update id="deleteLeaveWord" parameterType="long">
+        update leave_word set del_flag = 1 WHERE `id` = #{id}
+    </update>
+
+    <select id="pageLeaveWord" resultMap="leaveWordMap">
+        SELECT w.*,r.restaurant_name,r.address FROM leave_word w inner join restaurant r on w.restaurant_id = r.id
+        WHERE w.del_flag = 0
+        <if test="city !=null and city !=''">
+            and w.restaurant_city =#{city}
+        </if>
+        <if test="restaurantId !=null">
+            and w.restaurant_id =#{restaurantId}
+        </if>
+        <if test="wordType !=null">
+            and w.word_type =#{wordType}
+        </if>
+        <if test="startTime !=null">
+            and w.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null">
+            and w.create_time &lt;= #{endTime}
+        </if>
+        <if test="userOrPhone !=null and userOrPhone !=''">
+            and (w.user_name like CONCAT(CONCAT('%', #{userOrPhone}), '%')
+            or w.user_phone like CONCAT(CONCAT('%',#{userOrPhone}), '%'))
+        </if>
+        order by w.create_time desc
+    </select>
+
+    <select id="queryLeaveWordReply" resultType="com.fb.xujimanage.entity.LeaveWordReply">
+        SELECT * FROM leave_word_reply where leave_word_id = #{id} and del_flag = 0 order by create_time desc
+    </select>
+
+    <delete id="deleteLeaveWordImgRelate" parameterType="long">
+        delete from leaveword_img_relate where leaveword_id = #{leaveWordId}
+    </delete>
+</mapper>

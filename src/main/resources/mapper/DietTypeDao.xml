@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.DietTypeDao">
+
+    <resultMap type="com.fb.xujimanage.entity.DietType" id="DietTypeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="restaurantCode" column="restaurant_code" jdbcType="VARCHAR"/>
+        <result property="restaurantName" column="restaurant_name" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="sortNum" column="sort_num" jdbcType="INTEGER"/>
+        <result property="isShow" column="is_show" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" />
+        <result property="updateBy" column="update_by" />
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result column="del_flag" property="delFlag" />
+        <result column="big_or_small" property="bigOrSmall" />
+        <result column="price_type" property="priceType" />
+        <collection property="menuItems" ofType="com.fb.xujimanage.entity.MenuItem" resultMap="com.fb.xujimanage.dao.MenuItemDao.MenuItemMap"/>
+        <collection property="imageList" ofType="com.fb.xujimanage.entity.Image" resultMap="imageMap"/>
+        <collection property="videoList" ofType="com.fb.xujimanage.entity.Video" resultMap="videoMap"/>
+    </resultMap>
+    <resultMap id="imageMap" type="com.fb.xujimanage.entity.Image">
+        <id property="id" column="mid"/>
+        <result property="address" column="image_address"/>
+    </resultMap>
+
+    <resultMap id="videoMap" type="com.fb.xujimanage.entity.Video">
+        <id property="id" column="vid"/>
+        <result property="address" column="video_address"/>
+    </resultMap>
+    <!--查询单个-->
+    <select id="queryById" resultMap="DietTypeMap">
+        select
+          id, restaurant_code, restaurant_name, name, code, sort_num, is_show, create_by, update_by, create_time, update_time
+        from xuji_shop.diet_type
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="DietTypeMap">
+        select
+          id, restaurant_code, restaurant_name, name, code, sort_num, is_show, create_by, update_by, create_time, update_time
+        from xuji_shop.diet_type
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="DietTypeMap">
+        select
+        id, restaurant_code, restaurant_name, name, code, sort_num, is_show, create_by, update_by, create_time,
+        update_time
+        from xuji_shop.diet_type
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="restaurantCode != null and restaurantCode != ''">
+                and restaurant_code = #{restaurantCode}
+            </if>
+            <if test="restaurantName != null and restaurantName != ''">
+                and restaurant_name = #{restaurantName}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="sortNum != null">
+                and sort_num = #{sortNum}
+            </if>
+            <if test="isShow != null">
+                and is_show = #{isShow}
+            </if>
+            <if test="createBy != null">
+                and create_by = #{createBy}
+            </if>
+            <if test="updateBy != null">
+                and update_by = #{updateBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+
+
+        </where>
+    </select>
+    <select id="findAll" resultType="com.fb.xujimanage.entity.vo.DietTypeVo">
+        select
+        dt.id,
+        res.city,
+        dt.restaurant_code,
+        dt.restaurant_name,
+        dt.name, dt.code,
+        dt.sort_num,
+        dt.is_show,
+        dt.price_type
+        from
+        diet_type dt
+        left join
+        restaurant res
+        on
+        res.code=dt.restaurant_code
+        where 1=1
+        and dt.big_or_small=0
+        and dt.del_flag=0
+        <if test="city != null and city != ''"  >
+            and res.city = #{city}
+        </if>
+        <if test="restaurantCode != null">
+            and res.code = #{restaurantCode}
+        </if>
+        <if test="codeList != null">
+         and  dt.code in
+            <foreach collection="codeList" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+        ORDER BY  dt.sort_num desc
+
+
+
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into xuji_shop.diet_type(id,restaurant_code, restaurant_name, name, code, sort_num, is_show, create_by, update_by, create_time, update_time)
+        values (#{id},#{restaurantCode}, #{restaurantName}, #{name}, #{code}, #{sortNum}, #{isShow}, #{createBy}, #{updateBy}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update xuji_shop.diet_type
+        <set>
+            <if test="restaurantCode != null and restaurantCode != ''">
+                restaurant_code = #{restaurantCode},
+            </if>
+            <if test="restaurantName != null and restaurantName != ''">
+                restaurant_name = #{restaurantName},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="sortNum != null">
+                sort_num = #{sortNum},
+            </if>
+            <if test="isShow != null">
+                is_show = #{isShow},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="priceType !=null">
+                price_type = #{priceType}
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <update id="deleteById">
+        update  diet_type set  del_flag = 1  where id = #{id}
+    </update>
+    <!--通过门店的ID获取下拉列表-->
+    <select id="findDietTypeByRestaurantCode" parameterType="java.lang.String" resultType="com.fb.xujimanage.entity.vo.DietTypeResVo">
+     SELECT * from diet_type WHERE restaurant_code=#{restaurantCode} and del_flag=0 and big_or_small=0
+
+    </select>
+
+   <select id="selectOne" parameterType="com.fb.xujimanage.entity.DietType" resultType="com.fb.xujimanage.entity.DietType">
+    SELECT *
+    from diet_type
+    WHERE code=#{dietType.code}
+     and big_or_small=#{dietType.bigOrSmall}
+     and restaurant_code=#{dietType.restaurantCode}
+   </select>
+
+    <insert id="insertOne" parameterType="com.fb.xujimanage.entity.DietType" >
+        INSERT INTO diet_type (
+            `id`,
+            `restaurant_code`,
+            `restaurant_name`,
+            `name`,
+            `code`,
+            `sort_num`,
+            `is_show`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`,
+            `del_flag`,
+            `big_or_small`,
+            `price_type`
+        )
+        VALUES(
+            #{dietType.id},
+            #{dietType.restaurantCode},
+            #{dietType.restaurantName},
+            #{dietType.name},
+            #{dietType.code},
+            #{dietType.sortNum},
+            #{dietType.isShow},
+            #{dietType.createBy},
+            #{dietType.updateBy},
+            #{dietType.createTime},
+            #{dietType.updateTime},
+            #{dietType.delFlag},
+            #{dietType.bigOrSmall},
+            #{dietType.priceType}
+        )
+    </insert>
+
+    <update id="updateOne" parameterType="com.fb.xujimanage.entity.DietType" >
+        UPDATE diet_type
+        SET
+            id = #{dietType.id},
+            restaurant_code = #{dietType.restaurantCode},
+            restaurant_name = #{dietType.restaurantName},
+            name = #{dietType.name},
+            code = #{dietType.code},
+            sort_num = #{dietType.sortNum},
+            is_show = #{dietType.isShow},
+            create_by = #{dietType.createBy},
+            update_by = #{dietType.updateBy},
+            create_time = #{dietType.createTime},
+            update_time = #{dietType.updateTime},
+            del_flag = #{dietType.delFlag},
+            big_or_small = #{dietType.bigOrSmall},
+            price_type = #{dietType.priceType},
+            update_time = NOW()
+        WHERE  code=#{dietType.code}
+        and big_or_small=#{dietType.bigOrSmall}
+        and restaurant_code=#{dietType.restaurantCode}
+    </update>
+
+
+    <select id="selectDietTypes" resultType="com.fb.xujimanage.entity.DietType" parameterType="java.lang.String">
+
+        SELECT
+        * from diet_type
+         where code in
+        <foreach collection="codes" item="code" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+    </select>
+
+
+
+    <delete id="delByRestaurantCode" parameterType="java.lang.String" >
+        DELETE FROM diet_type
+        WHERE `restaurant_code` = #{restaurantCode}
+    </delete>
+
+    <insert id="insertDietType" parameterType="java.util.List">
+        INSERT INTO diet_type (
+        `id`,
+        `restaurant_code`,
+        `restaurant_name`,
+        `name`,
+        `code`,
+        `sort_num`,
+        `is_show`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `del_flag`,
+        `big_or_small`,
+        `price_type`
+        )
+        VALUES
+        <foreach collection="list" item="dietTypes" index="index" separator=",">
+                (
+                #{dietTypes.id},
+                #{dietTypes.restaurantCode},
+                #{dietTypes.restaurantName},
+                #{dietTypes.name},
+                #{dietTypes.code},
+                #{dietTypes.sortNum},
+                #{dietTypes.isShow},
+                #{dietTypes.createBy},
+                #{dietTypes.updateBy},
+                #{dietTypes.createTime},
+                #{dietTypes.updateTime},
+                #{dietTypes.delFlag},
+                #{dietTypes.bigOrSmall},
+                #{dietTypes.priceType}
+                )
+        </foreach>
+    </insert>
+
+
+
+    <delete id="delDietType" parameterType="java.util.List">
+        DELETE FROM diet_type
+        WHERE `id` in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

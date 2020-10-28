@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fb.xujimanage.dao.UserManageSysDao">
+    <select id="queryUserManage" parameterType="string" resultType="com.fb.xujimanage.entity.vo.UserManageSysVo">
+        SELECT * FROM user_manage_sys
+        where password = #{password} and (user_num = #{userName} or mobile = #{userName})
+    </select>
+
+    <update id="updateUserManageSys" parameterType="com.fb.xujimanage.entity.UserManageSys">
+        UPDATE user_manage_sys
+        SET
+        <if test="userName !=null and userName !=''">
+            user_name = #{userName},
+        </if>
+        <if test="department !=null and department !=''">
+            department = #{department},
+        </if>
+        <if test="orgId !=null and orgId !=''">
+            org_id = #{orgId},
+        </if>
+        <if test="mobile !=null and mobile !=''">
+            mobile = #{mobile},
+        </if>
+        <if test="password !=null and password !=''">
+            password = #{password},
+        </if>
+        <if test="gender !=null and gender !=''">
+            gender = #{gender},
+        </if>
+        <if test="userStatus !=null and userStatus !=''">
+            user_status = #{userStatus},
+        </if>
+        <if test="usageStatus !=null">
+            usage_status = #{usageStatus},
+        </if>
+        <if test="userType !=null and userType !=''">
+            user_type = #{userType},
+        </if>
+        update_time = sysdate()
+        WHERE user_num = #{userNum}
+    </update>
+
+    <update id="updateUsageStatusByUserNum">
+        UPDATE user_manage_sys
+        SET usage_status = #{usageStatus}, update_time = sysdate()
+        WHERE user_num in
+        <foreach collection="userNums" index="index" item="userNum" open="(" separator="," close=")">
+            #{userNum}
+        </foreach>
+    </update>
+
+    <select id="pageUserManageSys" parameterType="string" resultType="com.fb.xujimanage.entity.vo.UserManageSysVo">
+        SELECT u.*,r.restaurant_name,r.city FROM user_manage_sys u inner join restaurant r on u.org_id = r.org_id
+        WHERE 1=1
+        <if test="userNums!=null and userNums.size !=0">
+            and u.user_num in
+            <foreach collection="userNums" index="index" item="userNum" open="(" separator="," close=")">
+                #{userNum}
+            </foreach>
+        </if>
+        <if test="departmentList !=null and departmentList.size !=0">
+            and u.department in
+            <foreach collection="departmentList" index="index" item="department" open="(" separator="," close=")">
+                #{department}
+            </foreach>
+        </if>
+        <if test="usageStatus !=null">
+            and u.usage_status = #{usageStatus}
+        </if>
+        <if test="title !=null and title !=''">
+            and (u.user_name like CONCAT(CONCAT('%', #{title}), '%') or u.user_num like CONCAT(CONCAT('%', #{title}),
+            '%')
+            or u.mobile like CONCAT(CONCAT('%', #{title}), '%'))
+        </if>
+        order by u.create_time desc
+    </select>
+
+    <select id="pageUserNotRole" resultType="com.fb.xujimanage.entity.vo.UserManageSysVo">
+        SELECT um.*,r.restaurant_name,r.city FROM user_manage_sys um
+        left join user_role_relate ur on um.user_num = ur.employee_num
+        inner join restaurant r on um.org_id = r.org_id
+        WHERE ur.employee_num is null
+        <if test="departmentList !=null and departmentList.size !=0">
+            and um.department in
+            <foreach collection="departmentList" index="index" item="department" open="(" separator="," close=")">
+                #{department}
+            </foreach>
+        </if>
+        <if test="title !=null and title !=''">
+            and (um.user_name like CONCAT(CONCAT('%', #{title}), '%') or um.user_num like CONCAT(CONCAT('%', #{title}),
+            '%')
+            or um.mobile like CONCAT(CONCAT('%', #{title}), '%'))
+        </if>
+        order by um.create_time desc
+    </select>
+
+    <delete id="deleteUserManageSysAll">
+        delete from user_manage_sys
+        <if test="retainUserNames != null  and retainUserNames.size !=0">
+            where user_num not in
+            <foreach collection="retainUserNames" index="index" item="retainUserName" open="(" close=")" separator=",">
+                #{retainUserName}
+            </foreach>
+        </if>
+    </delete>
+
+    <insert id="addUserManageSys" parameterType="com.fb.xujimanage.entity.UserManageSys">
+        INSERT INTO user_manage_sys (id, user_num, user_name,department,org_id,
+        mobile,password,gender,user_status,user_type,usage_status,update_time,create_time)
+         VALUES(#{id}, #{userNum}, #{userName}, #{department}, #{orgId}, #{mobile}, #{password},
+          #{gender}, #{userStatus}, #{userType}, 0, #{updateTime}, #{updateTime})
+    </insert>
+
+    <insert id="addUserRole" parameterType="com.fb.xujimanage.entity.UserRoleRelate">
+        INSERT INTO user_role_relate (id, employee_num, role_id)
+         VALUES(#{id}, #{employeeNum}, #{roleId})
+    </insert>
+
+
+    <select id="getAllUserUserManageSysInfo" parameterType="java.lang.String"
+            resultType="com.fb.xujimanage.entity.vo.UserManageSysVo">
+        SELECT
+        em.id,
+        em.user_num ,
+        em.user_name,
+        em.department,
+        em.mobile,
+        em.gender,
+        re.city,
+        re.restaurant_name
+        from user_manage_sys em,restaurant re
+        WHERE em.org_id=re.org_id
+        and re.org_type='dept'and re.del_flag=0
+        <if test="mobile != null and mobile !='' ">
+            and (em.mobile like CONCAT('%',#{mobile},'%') or em.user_name like CONCAT('%',#{mobile},'%'))
+        </if>
+        <if test="restaurantCodes != null">
+            and re.code in
+            <foreach collection="restaurantCodes" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+</mapper>

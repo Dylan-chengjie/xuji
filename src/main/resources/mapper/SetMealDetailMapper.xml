@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.SetMealDetailDao">
+
+    <resultMap id="SetMealDetail" type="com.fb.xujimanage.entity.SetMealDetail" >
+        <result column="set_meal_id" property="setMealId" />
+        <result column="detail_type" property="detailType" />
+        <result column="diet_id" property="dietId" />
+        <result column="diet_code" property="dietCode" />
+        <result column="detail_quantity" property="detailQuantity" />
+        <result column="add_price" property="addPrice" />
+        <result column="default_select" property="defaultSelect" />
+        <result column="update_time" property="updateTime" />
+        <result column="restaurant_id" property="restaurantId" />
+        <association property="menuItem" javaType="com.fb.xujimanage.entity.MenuItem" resultMap="MenuItemMap"/>
+    </resultMap>
+    <resultMap id="MenuItemMap" type="com.fb.xujimanage.entity.MenuItem">
+        <result column="mi_name" property="name"/>
+        <result column="quantity" property="quantity"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `set_meal_id`,
+        `detail_type`,
+        `diet_id`,
+        `diet_code`,
+        `detail_quantity`,
+        `add_price`,
+        `default_select`
+    </sql>
+
+    <insert id="insertOne" parameterType="com.fb.xujimanage.entity.copy.SetMealDetailCopy" >
+        INSERT INTO set_meal_detail (
+            `set_meal_id`,
+            `detail_type`,
+            `diet_id`,
+            `diet_code`,
+            `detail_quantity`,
+            `add_price`,
+            `default_select`
+        )
+        VALUES(
+            #{setMealDetailCopy.setMealId},
+            #{setMealDetailCopy.detailType},
+            #{setMealDetailCopy.dietId},
+            #{setMealDetailCopy.dietCode},
+            #{setMealDetailCopy.detailQuantity},
+            #{setMealDetailCopy.addPrice},
+            #{setMealDetailCopy.defaultSelect}
+        )
+    </insert>
+
+
+
+    <update id="updateOne" parameterType="com.fb.xujimanage.entity.copy.SetMealDetailCopy" >
+        UPDATE set_meal_detail
+        SET
+            set_meal_id = #{setMealDetailCopy.setMealId},
+            detail_type = #{setMealDetailCopy.detailType},
+            diet_id = #{setMealDetailCopy.dietId},
+            diet_code = #{setMealDetailCopy.dietCode},
+            detail_quantity = #{setMealDetailCopy.detailQuantity},
+            add_price = #{setMealDetailCopy.addPrice},
+            default_select = #{setMealDetailCopy.defaultSelect}
+
+        WHERE `set_meal_id` = #{setMealDetailCopy.setMealId}
+    </update>
+
+
+    <select id="selectOneById" parameterType="java.lang.String" resultType="com.fb.xujimanage.entity.copy.SetMealDetailCopy">
+        SELECT <include refid="Base_Column_List" />
+        FROM set_meal_detail
+        WHERE `set_meal_id` = #{setMealId}
+    </select>
+
+
+    <delete id="delMealDetail" parameterType="java.lang.String" >
+        DELETE FROM set_meal_detail
+        WHERE `restaurant_id` = #{restaurantId}
+    </delete>
+
+
+
+    <insert id="insertMealDetail" parameterType="java.util.List">
+        INSERT INTO set_meal_detail (
+        `set_meal_id`,
+        `detail_type`,
+        `diet_id`,
+        `diet_code`,
+        `detail_quantity`,
+        `add_price`,
+        `default_select`,
+        `update_time`,
+        `restaurant_id`
+        )
+        VALUES
+        <foreach collection="setMealDetails" item="setMealDetail" index="index" separator=",">
+            (
+            #{setMealDetail.setMealId},
+            #{setMealDetail.detailType},
+            #{setMealDetail.dietId},
+            #{setMealDetail.dietCode},
+            #{setMealDetail.detailQuantity},
+            #{setMealDetail.addPrice},
+            #{setMealDetail.defaultSelect},
+            #{setMealDetail.updateTime},
+            #{setMealDetail.restaurantId}
+            )
+        </foreach>
+    </insert>
+
+
+    <delete id="delSetMealDetail" parameterType="java.util.List" >
+        DELETE FROM set_meal_detail
+        WHERE `set_meal_id`in
+        <foreach collection="setMealIds" item="setMealId" open="(" separator="," close=")">
+            #{setMealId}
+        </foreach>
+    </delete>
+
+</mapper>

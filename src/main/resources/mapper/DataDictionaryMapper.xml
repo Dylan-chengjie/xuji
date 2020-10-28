@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.DataDictionaryDao">
+    <insert id="addDataDictionary" parameterType="com.fb.xujimanage.entity.DataDictionary">
+        INSERT INTO
+        data_dictionary (
+        `id`, `name`, `sort_num`, `remark`, `status`, `code`,`del_flag`,
+        `create_by`, `update_by`, `create_time`, `update_time`
+        )
+        VALUES(
+        #{id}, #{name}, #{sortNum}, #{remark}, #{status},#{code}, 0,
+        #{createBy}, #{updateBy}, sysdate(), sysdate()
+        )
+    </insert>
+
+    <update id="deleteDataDictionary">
+        update data_dictionary set del_flag = 1 WHERE `id` = #{id}
+    </update>
+
+    <update id="updateDataDictionary" parameterType="com.fb.xujimanage.entity.DataDictionary">
+        UPDATE data_dictionary
+        SET
+        <if test="name !=null and name !=''">
+            name = #{name},
+        </if>
+        <if test="sortNum !=null">
+            sort_num = #{sortNum},
+        </if>
+        <if test="remark !=null and remark !=''">
+            remark = #{remark},
+        </if>
+        <if test="status !=null">
+            status = #{status},
+        </if>
+        <if test="updateBy !=null and updateBy !=''">
+            update_by = #{updateBy},
+        </if>
+        <if test="code !=null and code !=''">
+            code = #{code},
+        </if>
+        update_time = sysdate()
+        WHERE del_flag = 0 and id = #{id}
+    </update>
+
+
+    <select id="queryDataDictionary" resultType="com.fb.xujimanage.entity.DataDictionary">
+        SELECT * FROM data_dictionary
+        WHERE del_flag = 0
+        <if test="code !=null and code !=''">
+            and code =#{code}
+        </if>
+        <if test="name !=null and name !=''">
+            and name like CONCAT(CONCAT('%', #{name}), '%')
+        </if>
+        order by sort_num desc, create_time desc
+    </select>
+    <select id="getDataDictionaryById" resultType="com.fb.xujimanage.entity.DataDictionary">
+        select * from data_dictionary where id=#{id} and del_flag = 0
+    </select>
+</mapper>

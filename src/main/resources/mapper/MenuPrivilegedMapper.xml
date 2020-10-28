@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.MenuPrivilegedDao">
+    <insert id="addMenuPrivileged">
+        INSERT INTO
+        menu_privileged (
+        `id`, `name_cn`, `name_en`, `privileged_code`, `parent_code`, `icon_img_id`,`del_flag`,`menu_status`,
+        `create_by`, `update_by`, `create_time`, `update_time`, `sort_num`, `menu_type`, `menu_path`
+        )
+        VALUES(
+        #{id}, #{nameCn}, #{nameEn}, #{privilegedCode}, #{parentCode},#{iconImgId}, 0,#{menuStatus},
+        #{createBy}, #{updateBy}, sysdate(), sysdate(),#{sortNum},#{menuType},#{menuPath}
+        )
+    </insert>
+
+    <update id="batchDeleteMenuPrivileged" parameterType="long">
+        update menu_privileged set del_flag = 1 WHERE `id` in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateMenuPrivileged" parameterType="string">
+        UPDATE menu_privileged
+        SET
+        <if test="nameCn !=null and nameCn !=''">
+            name_cn = #{nameCn},
+        </if>
+        <if test="nameEn !=null and nameEn !=''">
+            name_en = #{nameEn},
+        </if>
+        <if test="iconImgId !=null and iconImgId !=''">
+            icon_img_id = #{iconImgId},
+        </if>
+        <if test="updateBy !=null and updateBy !=''">
+            update_by = #{updateBy},
+        </if>
+        <if test="menuStatus !=null">
+            menu_status = #{menuStatus},
+        </if>
+        <if test="sortNum !=null">
+            sort_num = #{sortNum},
+        </if>
+        update_time = sysdate()
+        WHERE del_flag = 0 and id = #{id}
+    </update>
+
+    <select id="listMenuPrivileged" resultType="com.fb.xujimanage.entity.vo.MenuPrivilegedVo">
+        SELECT * FROM menu_privileged where del_flag = 0
+        <if test="menuType !=null">
+            and menu_type =#{menuType}
+        </if>
+        <if test="parentCode !=null and parentCode !=''">
+            and parent_code =#{parentCode}
+        </if>
+        <if test="menuName !=null and menuName !=''">
+            AND name_cn like CONCAT('%', #{menuName}, '%')
+        </if>
+        order by sort_num desc,create_time desc
+    </select>
+
+    <select id="listMenuIconImgIdById" resultType="long">
+        SELECT icon_img_id FROM menu_privileged where del_flag = 0 and `id` in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="queryRolePrivilegedByRoleId" resultType="com.fb.xujimanage.entity.vo.MenuPrivilegedVo">
+        SELECT distinct mp.*,im.address FROM role_menu_privi_relate rm inner join menu_privileged mp
+        on rm.privileged_code = mp.privileged_code and mp.del_flag = 0 and menu_status = 0 and rm.role_id in
+        <foreach collection="roleIds" index="index" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+        inner join image im on mp.icon_img_id = im.id
+    </select>
+
+    <select id="countPrivilegedByCode" resultType="int">
+        SELECT count(0) FROM menu_privileged where privileged_code = #{privilegedCode} and del_flag = 0
+    </select>
+
+    <select id="listAllMenuPrivileged" resultType="com.fb.xujimanage.entity.vo.MenuPrivilegedVo">
+        SELECT
+        m.*,
+        i.`address` AS address
+        FROM
+        menu_privileged m
+        LEFT JOIN image i
+        ON m.`icon_img_id` = i.`id`
+        WHERE m.del_flag = 0
+        <if test="menuName !=null and menuName !=''">
+            AND m.name_cn like CONCAT('%', #{menuName}, '%')
+        </if>
+        ORDER BY m.sort_num DESC,
+        m.create_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.DataDictValueDao">
+    <sql id="Base_Column_List">
+        `id`,
+        `dictionary_id`,
+        `name`,
+        `value`,
+        `sort_num`,
+        `remark`,
+        `status`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`
+    </sql>
+    <insert id="addDataDictValue" parameterType="com.fb.xujimanage.entity.DataDictValue">
+        INSERT INTO
+        data_dict_value (
+        `id`, `dictionary_id`, `name`, `value`, `sort_num`, `remark`, `status`,
+        `del_flag`, `create_by`, `update_by`, `create_time`, `update_time`
+        )
+        VALUES(
+        #{id}, #{dictionaryId}, #{name}, #{value}, #{sortNum}, #{remark}, #{status},
+        0, #{createBy}, #{updateBy}, sysdate(), sysdate()
+        )
+    </insert>
+
+    <update id="batchDeleteDataDictValue">
+        update data_dict_value set del_flag = 1 WHERE `id` in
+        <foreach collection="dataIds" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="deleteDataDictValueByDictionaryId">
+        update data_dict_value set del_flag = 1 WHERE `dictionary_id` =#{dictionaryId}
+    </update>
+
+    <update id="updateDataDictValue" parameterType="com.fb.xujimanage.entity.DataDictValue">
+        UPDATE data_dict_value
+        SET
+        <if test="name !=null and name !=''">
+            name = #{name},
+        </if>
+        <if test="value !=null and value !=''">
+            value = #{value},
+        </if>
+        <if test="sortNum !=null">
+            sort_num = #{sortNum},
+        </if>
+        <if test="remark !=null and remark !=''">
+            remark = #{remark},
+        </if>
+        <if test="status !=null">
+            status = #{status},
+        </if>
+        <if test="updateBy !=null and updateBy !=''">
+            update_by = #{updateBy},
+        </if>
+        update_time = sysdate()
+        WHERE del_flag = 0 and id = #{id}
+    </update>
+
+
+    <select id="queryValueByDictionaryId" resultType="com.fb.xujimanage.entity.DataDictValue">
+        SELECT * FROM data_dict_value
+        WHERE del_flag = 0
+        <if test="dictionaryId !=null and dictionaryId !=''">
+            and dictionary_id = #{dictionaryId}
+        </if>
+        order by sort_num desc,create_time desc
+    </select>
+
+    <select id="load" resultType="com.fb.xujimanage.entity.DataDictValue">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM data_dict_value
+        WHERE `id` = #{id} AND status = 0
+        AND del_flag = 0
+    </select>
+</mapper>

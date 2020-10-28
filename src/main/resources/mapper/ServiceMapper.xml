@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fb.xujimanage.dao.ServiceDao">
+
+    <resultMap id="ServiceMap" type="com.fb.xujimanage.entity.FeatureService">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="scene_dicvalue_id" property="sceneDicvalueId"/>
+        <result column="service_explain" property="serviceExplain"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remarks" property="remarks"/>
+        <collection property="restaurantList" ofType="com.fb.xujimanage.entity.Restaurant" resultMap="restaurantMap"/>
+        <collection property="imageList" ofType="com.fb.xujimanage.entity.Image" resultMap="imageMap"/>
+        <collection property="videoList" ofType="com.fb.xujimanage.entity.Video" resultMap="videoMap"/>
+    </resultMap>
+    <resultMap id="restaurantMap" type="com.fb.xujimanage.entity.Restaurant">
+        <id property="id" column="reid"/>
+        <result property="restaurantName" column="restaurant_name"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="area" column="area"/>
+    </resultMap>
+
+    <resultMap id="imageMap" type="com.fb.xujimanage.entity.Image">
+        <id property="id" column="mid"/>
+        <result property="address" column="image_address"/>
+    </resultMap>
+
+    <resultMap id="videoMap" type="com.fb.xujimanage.entity.Video">
+        <id property="id" column="vid"/>
+        <result property="address" column="video_address"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `name`,
+        `scene_dicvalue_id`,
+        `service_explain`,
+        `del_flag`,
+        `create_by`,
+        `update_by`,
+        `create_time`,
+        `update_time`,
+        `remarks`
+    </sql>
+
+    <insert id="insert" parameterType="com.fb.xujimanage.entity.FeatureService">
+        INSERT INTO service (
+            `id`,
+            `name`,
+            `scene_dicvalue_id`,
+            `service_explain`,
+            `del_flag`,
+            `create_by`,
+            `update_by`,
+            `create_time`,
+            `update_time`,
+            `remarks`
+        )
+        VALUES(
+            #{id},
+            #{name},
+            #{sceneDicvalueId},
+            #{serviceExplain},
+            #{delFlag},
+            #{createBy},
+            #{updateBy},
+            #{createTime},
+            #{updateTime},
+            #{remarks}
+        )
+    </insert>
+
+    <delete id="delete" parameterType="java.util.Map">
+        DELETE FROM service
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.fb.xujimanage.entity.FeatureService">
+        UPDATE service
+        SET
+            id = #{id},
+            name = #{name},
+            scene_dicvalue_id = #{sceneDicvalueId},
+            service_explain = #{serviceExplain},
+            del_flag = #{delFlag},
+            create_by = #{createBy},
+            update_by = #{updateBy},
+            create_time = #{createTime},
+            update_time = #{updateTime},
+            remarks = #{remarks}
+        WHERE `id` = #{id}
+    </update>
+    <select id="load" parameterType="java.util.Map" resultMap="ServiceMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM service
+        WHERE `id` = #{id}
+        AND del_flag = 0
+    </select>
+
+    <select id="pageList" parameterType="java.util.Map" resultMap="ServiceMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM service
+        LIMIT #{offset}, #{pagesize}
+    </select>
+
+    <select id="pageListCount" parameterType="java.util.Map" resultType="int">
+        SELECT count(1)
+        FROM service
+    </select>
+    <select id="loadServiceInfo" resultMap="ServiceMap">
+        SELECT
+        me.id,
+        me.name,
+        me.scene_dicvalue_id,
+        me.service_explain,
+        re.restaurant_name,
+        re.address,
+        re.city,
+        re.area,
+        re.id AS reid,
+        vi.id AS vid,
+        vi.address AS video_address,
+        im.id AS mid,
+        im.address AS image_address
+        FROM
+        (SELECT ce.id,ce.del_flag,ce.name,ce.scene_dicvalue_id,ce.service_explain,ce.create_time FROM service ce WHERE ce.del_flag = 0
+        <if test="sellingPointName != null and sellingPointName != '' ">
+            AND ce.name LIKE concat('%',#{sellingPointName},'%')
+        </if>
+        ORDER BY ce.create_time DESC
+        LIMIT #{currentPage},#{pageSize}) me
+        LEFT JOIN restaurant_service_relate rm ON me.id = rm.service_id
+        LEFT JOIN restaurant re ON rm.restaurant_id = re.id AND re.del_flag = 0 AND re.org_type = 'store'
+        LEFT JOIN service_img_relate mi ON me.id = mi.service_id
+        LEFT JOIN image im ON mi.img_id = im.id AND im.del_flag = 0
+        LEFT JOIN service_video_relate mv ON me.id = mv.service_id
+        LEFT JOIN video vi ON mv.video_id = vi.id AND vi.del_flag = 0
+    </select>
+
+    <select id="getServiceTotal" resultType="int">
+        SELECT COUNT(*) FROM service WHERE del_flag = 0
+        <if test="sellingPointName != null and sellingPointName != '' ">
+            AND `name` LIKE concat('%',#{sellingPointName},'%')
+        </if>
+    </select>
+
+    <select id="selectFeatureService" resultMap="ServiceMap">
+        SELECT
+            se.id
+        FROM
+            service se
+            LEFT JOIN restaurant_service_relate sr ON se.id = sr.service_id
+            LEFT JOIN restaurant re ON sr.restaurant_id = re.id AND re.org_type = 'store' AND re.del_flag = 0
+        WHERE
+            se.del_flag = 0
+            AND se.scene_dicvalue_id =#{sceneId}
+            AND re.id = #{restaurantId}
+    </select>
+
+</mapper>

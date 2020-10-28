@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fb.xujimanage.dao.UserRoleRelateDao">
+    <select id="listRoleId" parameterType="string" resultType="long">
+        select role_id from user_role_relate where employee_num = #{employeeNum}
+    </select>
+
+    <select id="countUserByRoleId" parameterType="long" resultType="int">
+        select count(employee_num) from user_role_relate where role_id in
+        <foreach collection="roleIds" index="index" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </select>
+
+    <select id="listUserNumByRoleId" resultType="string">
+        select distinct employee_num from user_role_relate
+        <where>
+            <if test="roleId !=null">
+                role_id = #{roleId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addUserRole" parameterType="com.fb.xujimanage.entity.UserRoleRelate">
+        INSERT INTO user_role_relate (id, employee_num, role_id)
+         VALUES(#{id}, #{employeeNum}, #{roleId})
+    </insert>
+
+    <delete id="deleteUserRole" parameterType="string">
+        delete from user_role_relate where employee_num = #{employeeNum} and role_id in
+        <foreach collection="roleIds" index="index" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+</mapper>
